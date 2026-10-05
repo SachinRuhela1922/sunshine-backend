@@ -39,10 +39,30 @@ function deepFill(target, def) {
   return changed;
 }
 
+// one-time fixes for content saved before the founding date (04 July 2003) was added
+function migrate(data) {
+  let changed = false;
+  const h = data.hero;
+  if (h && typeof h.subtitle === 'string' && /since 1995/i.test(h.subtitle)) { h.subtitle = h.subtitle.replace(/since 1995/i, 'since 2003'); changed = true; }
+  if (Array.isArray(data.stats)) {
+    data.stats.forEach((s) => { if (s && /years/i.test(s.label || '') && s.value !== 'auto') { s.value = 'auto'; changed = true; } });
+  }
+  return changed;
+}
+
+// the founding date must look like YYYY-MM-DD, otherwise the default (04 July 2003) is used
+function cleanEstablished(data) {
+  if (!isObj(data.general)) return;
+  const v = data.general.established;
+  if (typeof v !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(v) || isNaN(Date.parse(v))) data.general.established = defaults.general.established;
+}
+
 async function getDoc() {
   let doc = await Content.findOne({ key: 'site' });
   if (!doc) return Content.create({ key: 'site', data: clone(defaults) });
-  if (deepFill(doc.data, defaults)) { doc.markModified('data'); await doc.save(); }
+  const a = deepFill(doc.data, defaults);
+  const b = migrate(doc.data);
+  if (a || b) { doc.markModified('data'); await doc.save(); }
   return doc;
 }
 
@@ -98,7 +118,7 @@ router.put('/content', auth, async (req, res) => {
   try {
     if (!isObj(req.body) || !Object.keys(req.body).length) return res.status(400).json({ error: 'Invalid content' });
     const doc = await getDoc();
-    doc.data = req.body; deepFill(doc.data, defaults); doc.markModified('data'); await doc.save();
+    doc.data = req.body; deepFill(doc.data, defaults); cleanEstablished(doc.data); doc.markModified('data'); await doc.save();
     cache = null; // next public request loads the fresh data
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }

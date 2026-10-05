@@ -2,11 +2,12 @@ const U = (id, w = 900) => `https://images.unsplash.com/${id}?auto=format&fit=cr
 const base = {
   general: {
     schoolName: 'Sunshine School', tagline: 'Learn. Grow. Shine.', logo: '',
+    established: '2003-07-04', // school founding date (YYYY-MM-DD). "Years of Excellence" is calculated from this.
     phone: '+91 98765 43210', email: 'info@sunshineschool.edu', address: 'Main Road, Moradabad, Uttar Pradesh, India',
     mapEmbed: '', facebook: '', instagram: '', youtube: ''
   },
   hero: {
-    title: 'Welcome to Sunshine School', subtitle: 'Nurturing young minds with knowledge, values and creativity since 1995.',
+    title: 'Welcome to Sunshine School', subtitle: 'Nurturing young minds with knowledge, values and creativity since 2003.',
     ctaText: 'Apply for Admission',
     video: 'https://res.cloudinary.com/demo/video/upload/dog.mp4',
     poster: U('photo-1503676260728-1c00da094a0b', 1400)
@@ -31,7 +32,7 @@ const base = {
   },
   stats: [
     { label: 'Students', value: '1500+' }, { label: 'Teachers', value: '80+' },
-    { label: 'Years of Excellence', value: '30' }, { label: 'Awards', value: '120+' }
+    { label: 'Years of Excellence', value: 'auto' }, { label: 'Awards', value: '120+' }
   ],
   programs: [
     { title: 'Pre-Primary', desc: 'Play-based learning for ages 3 to 5.', image: U('photo-1587654780291-39c9404d746b') },
